@@ -49,6 +49,7 @@ func (modal *UserModel) Authenticate(email, password string) (int, error) {
     var hashedPassword []byte
 
     statement := `SELECT id, hashed_password FROM users WHERE email = ?`
+
     err := modal.DB.QueryRow(statement, email).Scan(&id, &hashedPassword)
     if err != nil {
         if errors.Is(err, sql.ErrNoRows) {
@@ -69,7 +70,12 @@ func (modal *UserModel) Authenticate(email, password string) (int, error) {
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {
-    return false, nil
+    var exists bool
+
+    statement := "SELECT EXISTS(SELECT true FROM users WHERE id = ?)"
+
+    err := m.DB.QueryRow(statement, id).Scan(&exists)
+    return exists, err
 }
 
 
