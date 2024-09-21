@@ -19,17 +19,19 @@ import (
 )
 
 type application struct {
-    logger        *slog.Logger
-    snippets      *models.SnippetModel
-    users         *models.UserModel
-    templateCache map[string]*template.Template
-    formDecoder   *form.Decoder
+    logger         *slog.Logger
+    snippets       models.SnippetModelInterface
+    users          models.UserModelInterface
+    templateCache  map[string]*template.Template
+    formDecoder    *form.Decoder
     sessionManager *scs.SessionManager
+    debugMode      bool 
 }
 
 func main() {
-    addr := flag.String("addr", ":4000", "HTTP networ address")
-    dsn  := flag.String("dsn", "web:snipper@/snippetbox?parseTime=true", "MySQL data source name")
+    addr  := flag.String("addr", ":4000", "HTTP networ address")
+    dsn   := flag.String("dsn", "web:snipper@/snippetbox?parseTime=true", "MySQL data source name")
+    debug := flag.Bool("debug", false, "Enable debug mode")
     flag.Parse()
 
     logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -55,12 +57,13 @@ func main() {
     sessionManager.Cookie.Secure = true
 
     app := &application{
-        logger:        logger,
-        snippets:      &models.SnippetModel{DB: db},
-        users:         &models.UserModel{DB: db},
-        templateCache: templateCache,
-        formDecoder:   formDecoder,
+        logger:         logger,
+        snippets:       &models.SnippetModel{DB: db},
+        users:          &models.UserModel{DB: db},
+        templateCache:  templateCache,
+        formDecoder:    formDecoder,
         sessionManager: sessionManager,
+        debugMode:      *debug,
     }
 
     tlsConfig := &tls.Config{
