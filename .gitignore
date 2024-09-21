@@ -10,10 +10,16 @@
 # But not these files...
 !/.gitignore
 
+# Go files
 !*.go
 !go.sum
 !go.mod
+
+# UI related files
 !*.tmpl.html
+!*.css
+!*.js
+
 
 !README.md
 !LICENSE
